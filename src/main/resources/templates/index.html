@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Manager</title>
+    <style>
+        :root {
+            --bg: #f2eee7;
+            --paper: #fffdf8;
+            --ink: #1f1f1f;
+            --muted: #666;
+            --accent: #bf3c2f;
+            --accent-dark: #8b2d24;
+            --line: #e6ddd0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Noto Sans KR", "Pretendard", sans-serif;
+            color: var(--ink);
+            background: radial-gradient(circle at 10% 10%, #fffaf2 0%, var(--bg) 45%, #e8dfd3 100%);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            width: min(1024px, 92vw);
+            margin: 48px auto;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #1f1f1f 0%, #3a3a3a 55%, #525252 100%);
+            color: #fff;
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 36px);
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            color: #e5e5e5;
+        }
+
+        .grid {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            animation: rise 0.45s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .card:nth-child(2) { animation-delay: 0.06s; }
+        .card:nth-child(3) { animation-delay: 0.12s; }
+        .card:nth-child(4) { animation-delay: 0.18s; }
+
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .name {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .price {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 96px;
+            padding: 10px 12px;
+            border: 1px solid #cfc3b2;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        button {
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+        }
+
+        .empty {
+            margin-top: 20px;
+            background: #fff6ec;
+            border: 1px solid #f1d7b9;
+            color: #6d4722;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .help {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <section class="hero">
+        <h1>상품 목록 및 주문</h1>
+        <p>수량을 입력하고 주문하기를 누르면 Fetch API로 주문을 요청합니다.</p>
+    </section>
+
+    <section class="grid" th:if="${!#lists.isEmpty(products)}">
+        <article class="card" th:each="product : ${products}">
+            <h2 class="name" th:text="${product.name}">상품명</h2>
+            <p class="price" th:text="|가격: ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}원|">가격</p>
+            <div class="row">
+                <label th:for="|qty-${product.productId}|">수량</label>
+                <input type="number" min="1" value="1" th:id="|qty-${product.productId}|">
+            </div>
+            <button type="button" th:attr="data-product-id=${product.productId}" onclick="placeOrder(this)">주문하기</button>
+        </article>
+    </section>
+
+    <div class="empty" th:if="${#lists.isEmpty(products)}">
+        등록된 상품이 없습니다.
+    </div>
+
+    <p class="help">주문 성공 시 주문 번호를, 실패 시 에러 메시지를 얼럿으로 표시합니다.</p>
+</div>
+
+<script>
+    async function placeOrder(button) {
+        const productId = Number(button.dataset.productId);
+        const qtyInput = document.getElementById(`qty-${productId}`);
+        const quantity = Number(qtyInput.value);
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            alert("수량은 1 이상의 정수여야 합니다.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId,
+                    quantity
+                })
+            });
+
+            const payload = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                alert(`주문 성공: 주문번호 ${payload.orderId}`);
+                return;
+            }
+
+            const message = payload.message || '주문 처리 중 오류가 발생했습니다.';
+            alert(`주문 실패: ${message}`);
+        } catch (error) {
+            alert('네트워크 오류로 주문에 실패했습니다.');
+        }
+    }
+</script>
+</body>
+</html>

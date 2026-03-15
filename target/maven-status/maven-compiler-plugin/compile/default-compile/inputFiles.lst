@@ -1,5 +1,7 @@
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/OrderMgrSystemApplication.java
+/workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/config/DataInitializer.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/controller/OrderController.java
+/workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/controller/ViewController.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/domain/Order.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/domain/OrderStatus.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/domain/Product.java
@@ -7,6 +9,7 @@
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/dto/ApiErrorResponse.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/dto/CreateOrderRequest.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/dto/OrderResponse.java
+/workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/dto/ProductListItem.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/exception/BusinessException.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/exception/GlobalExceptionHandler.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/exception/OutOfStockException.java
@@ -16,3 +19,5 @@
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/repository/StockRepository.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/service/OrderService.java
 /workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/service/OrderServiceImpl.java
+/workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/service/ProductQueryService.java
+/workspaces/OrderMgrSystem/src/main/java/com/ohsin/ordermgr/service/ProductQueryServiceImpl.java
